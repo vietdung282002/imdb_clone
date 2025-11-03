@@ -34,15 +34,15 @@ onMounted(async () => {
   <main class="home">
     <div class="hero-section">
       <div class="container">
-        <h1 class="hero-title">Chào mừng đến với IMDb Clone</h1>
-        <p class="hero-subtitle">Khám phá những bộ phim hay nhất</p>
+        <h1 class="hero-title">Welcome to IMDb Clone</h1>
+        <p class="hero-subtitle">Discover the best movies and TV shows</p>
       </div>
     </div>
 
-    <MovieSection title="Phổ biến" :movies="popularMovies" />
-    <MovieSection title="Đang chiếu" :movies="nowPlayingMovies" />
-    <MovieSection title="Sắp chiếu" :movies="upcomingMovies" />
-    <MovieSection title="Xếp hạng cao" :movies="topRatedMovies" />
+    <MovieSection title="Popular" :movies="popularMovies" />
+    <MovieSection title="Now Playing" :movies="nowPlayingMovies" />
+    <MovieSection title="Upcoming" :movies="upcomingMovies" />
+    <MovieSection title="Top Rated" :movies="topRatedMovies" />
   </main>
 </template>
 

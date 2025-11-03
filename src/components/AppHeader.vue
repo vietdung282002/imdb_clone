@@ -18,13 +18,7 @@ const searchQuery = ref('')
 const selectedLanguage = ref('EN')
 const isLanguageOpen = ref(false)
 
-const languages = [
-  { code: 'EN', name: 'English' },
-  { code: 'VI', name: 'Tiếng Việt' },
-  { code: 'ES', name: 'Español' },
-  { code: 'FR', name: 'Français' },
-  { code: 'DE', name: 'Deutsch' },
-]
+const languages = [{ code: 'EN', name: 'English' }]
 
 const toggleLanguage = () => {
   isLanguageOpen.value = !isLanguageOpen.value
@@ -79,45 +73,20 @@ const handleSearch = (query) => {
 
         <div class="header-actions">
           <button class="action-button">
-            <svg
+            <img
               class="action-icon"
+              src="@/assets/bookmark.svg"
+              alt="Watchlist"
               width="14"
               height="18"
-              viewBox="0 0 14 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 0H2C0.9 0 0 0.9 0 2V18L7 15L14 18V2C14 0.9 13.1 0 12 0Z"
-                fill="currentColor"
-              />
-            </svg>
+            />
+
             <span>Watchlist</span>
           </button>
 
           <button class="action-button">
-            <svg
-              class="action-icon"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clip-path="url(#clip0_user)">
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M12 23C18.0751 23 23 18.0751 23 12C23 5.92487 18.0751 1 12 1C5.92487 1 1 5.92487 1 12C1 18.0751 5.92487 23 12 23ZM14.5629 8.57143C14.5629 9.99429 13.4229 11.1429 12 11.1429C10.5771 11.1429 9.42857 9.99429 9.42857 8.57143C9.42857 7.14857 10.5771 6 12 6C13.4229 6 14.5629 7.14857 14.5629 8.57143ZM6 15.8571C6 13.86 10.0029 12.8571 12 12.8571C13.9971 12.8571 18 13.86 18 15.8571V17.1429C18 17.6143 17.6143 18 17.1429 18H6.85714C6.38571 18 6 17.6143 6 17.1429V15.8571Z"
-                  fill="currentColor"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_user">
-                  <rect width="24" height="24" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
+            <img class="action-icon" src="@/assets/user.svg" alt="User" width="20" height="20" />
+
             <span>User</span>
           </button>
 

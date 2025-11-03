@@ -17,37 +17,46 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
   <div class="movie-card">
     <div class="poster-wrapper">
       <img :src="posterUrl" :alt="movie.title" class="poster" />
-      <div class="rating-badge">{{ rating }}</div>
     </div>
     <div class="movie-info">
       <h3 class="movie-title">{{ movie.title }}</h3>
-      <p class="movie-date">{{ movie.release_date?.split('-')[0] || 'N/A' }}</p>
+      <div class="meta-row">
+        <div class="imdb-rating">
+          <img class="action-icon" src="@/assets/filled_star.svg" width="24" height="24" />
+          <span class="score">{{ rating }}</span>
+        </div>
+        <div class="imdb-rating">
+          <img class="action-icon" src="@/assets/star.svg" width="24" height="24" />
+          <span class="rate">Rate</span>
+        </div>
+        <div class="info-btn">
+          <img src="@/assets/info.svg" width="20" height="20" />
+        </div>
+      </div>
+      <button class="trailer-btn">
+        <img src="@/assets/play.svg" width="24" height="24" />
+        <span>Trailer</span>
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .movie-card {
-  background-color: #1a1a1a;
-  border-radius: 8px;
+  background-color: rgba(163, 163, 163, 0.05);
+  border-radius: 10px;
   overflow: hidden;
-  transition:
-    transform 0.3s,
-    box-shadow 0.3s;
   cursor: pointer;
-}
-
-.movie-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  padding: 12px;
 }
 
 .poster-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 150%; /* 2:3 aspect ratio */
+  padding-top: 150%;
   overflow: hidden;
   background-color: #2a2a2a;
+  border-radius: 5px;
 }
 
 .poster {
@@ -57,38 +66,81 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.rating-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: #000;
-  color: #f5c518;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 0.875rem;
-}
-
-.movie-info {
-  padding: 1rem;
+  border-radius: 5px;
 }
 
 .movie-title {
-  margin: 0 0 0.5rem 0;
+  margin: 1rem 0;
   font-size: 1rem;
-  color: #fff;
-  font-weight: 600;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  color: #c3c3c3;
+  font-weight: 500;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.movie-date {
-  margin: 0;
-  color: #999;
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #bdbdbd;
   font-size: 0.875rem;
+}
+
+.imdb-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 7px;
+}
+
+.imdb-rating .action-icon {
+  display: block;
+}
+
+.score {
+  color: #c3c3c3;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.muted {
+  color: #777;
+}
+
+.rate-btn {
+  background: none;
+  border: none;
+  color: #bdbdbd;
+  cursor: pointer;
+}
+
+.trailer-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 18px;
+  background-color: rgba(163, 163, 163, 0.06);
+  color: #cfcfcf;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  font-family: 'Roboto';
+  box-shadow:
+    inset 0 2px 6px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
 }
 </style>

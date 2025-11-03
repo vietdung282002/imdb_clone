@@ -1,12 +1,10 @@
-const API_KEY = import.meta.env.VITE_API_KEY || 'your-api-key-here'
+const API_KEY = import.meta.env.VITE_API_KEY || 'a78465ca31af77ddc48dc5e525d629ba'
 const API_BASE_URL = 'https://api.themoviedb.org/3'
 
 export const api = {
   async getPopularMovies() {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/movie/popular?api_key=${API_KEY}&language=vi-VN`,
-      )
+      const response = await fetch(`${API_BASE_URL}/movie/popular?api_key=${API_KEY}`)
       const data = await response.json()
       return data.results || []
     } catch (error) {
@@ -17,9 +15,7 @@ export const api = {
 
   async getNowPlayingMovies() {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=vi-VN`,
-      )
+      const response = await fetch(`${API_BASE_URL}/movie/now_playing?api_key=${API_KEY}`)
       const data = await response.json()
       return data.results || []
     } catch (error) {
@@ -30,9 +26,7 @@ export const api = {
 
   async getUpcomingMovies() {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=vi-VN`,
-      )
+      const response = await fetch(`${API_BASE_URL}/movie/upcoming?api_key=${API_KEY}`)
       const data = await response.json()
       return data.results || []
     } catch (error) {
@@ -43,9 +37,7 @@ export const api = {
 
   async getTopRatedMovies() {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=vi-VN`,
-      )
+      const response = await fetch(`${API_BASE_URL}/movie/top_rated?api_key=${API_KEY}`)
       const data = await response.json()
       return data.results || []
     } catch (error) {
@@ -57,7 +49,7 @@ export const api = {
   async searchMovies(query) {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/search/movie?api_key=${API_KEY}&language=vi-VN&query=${encodeURIComponent(query)}`,
+        `${API_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
       )
       const data = await response.json()
       return data.results || []
@@ -69,9 +61,7 @@ export const api = {
 
   async getMovieDetails(movieId) {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=vi-VN`,
-      )
+      const response = await fetch(`${API_BASE_URL}/movie/${movieId}?api_key=${API_KEY}`)
       return await response.json()
     } catch (error) {
       console.error('Error fetching movie details:', error)
