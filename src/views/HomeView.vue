@@ -1,48 +1,30 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import MovieSection from '@/components/MovieSection.vue'
-import { api } from '@/services/api'
+import { useMovieStore } from '@/stores/movie'
+import HeroFeatured from '@/components/HeroFeatured.vue'
 
-const popularMovies = ref([])
-const nowPlayingMovies = ref([])
-const upcomingMovies = ref([])
-const topRatedMovies = ref([])
-const loading = ref(true)
+const movieStore = useMovieStore()
 
-onMounted(async () => {
-  try {
-    const [popular, nowPlaying, upcoming, topRated] = await Promise.all([
-      api.getPopularMovies(),
-      api.getNowPlayingMovies(),
-      api.getUpcomingMovies(),
-      api.getTopRatedMovies(),
-    ])
-
-    popularMovies.value = popular
-    nowPlayingMovies.value = nowPlaying
-    upcomingMovies.value = upcoming
-    topRatedMovies.value = topRated
-  } catch (error) {
-    console.error('Error loading movies:', error)
-  } finally {
-    loading.value = false
-  }
+onMounted(() => {
+  movieStore.fetchAll()
 })
 </script>
 
 <template>
   <main class="home">
-    <div class="hero-section">
-      <div class="container">
-        <h1 class="hero-title">Welcome to IMDb Clone</h1>
-        <p class="hero-subtitle">Discover the best movies and TV shows</p>
-      </div>
-    </div>
-
-    <MovieSection title="Popular" :movies="popularMovies" />
-    <MovieSection title="Now Playing" :movies="nowPlayingMovies" />
-    <MovieSection title="Upcoming" :movies="upcomingMovies" />
-    <MovieSection title="Top Rated" :movies="topRatedMovies" />
+    <HeroFeatured :movies="movieStore.popular" />
+    <MovieSection
+      title="Top Picks"
+      subtitle="TV shows and movies just for you"
+      :movies="movieStore.popular"
+    />
+    <MovieSection title="Top on IMDb this week" :movies="movieStore.nowPlaying" />
+    <MovieSection
+      title="IMDb Originals"
+      subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
+      :movies="movieStore.upcoming"
+    />
   </main>
 </template>
 
@@ -50,6 +32,9 @@ onMounted(async () => {
 .home {
   min-height: 100vh;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
 }
 
 .hero-section {

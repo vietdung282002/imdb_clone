@@ -1,11 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch,} from 'vue'
 import MovieCard from './MovieCard.vue'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true,
+  },
+  subtitle: {
+    type: String,
   },
   movies: {
     type: Array,
@@ -13,25 +16,90 @@ defineProps({
   },
 })
 
-const scrollerEl = ref(null)
+const scrollerRef = ref(null)
+const isAnimating = ref(false)
+const canScrollPrev = ref(false)
+const canScrollNext = ref(false)
 
-function getCardWidth() {
-  const track = scrollerEl.value?.querySelector('.row-track')
+function getItemWidth() {
+  const track = scrollerRef.value?.querySelector('.row-track')
   const first = track?.children?.[0]
   return first ? first.getBoundingClientRect().width : 220
 }
 
-function scrollByPage(direction = 1) {
-  if (!scrollerEl.value) return
-  const viewport = scrollerEl.value.getBoundingClientRect().width
-  const cardW = getCardWidth()
-  const cardsPerPage = Math.max(1, Math.floor(viewport / (cardW + 16)))
-  const distance = direction * cardsPerPage * (cardW + 16)
-  scrollerEl.value.scrollBy({ left: distance, behavior: 'smooth' })
+function scrollPage(direction = 1) {
+  if (!scrollerRef.value) return
+
+  const viewport = scrollerRef.value.getBoundingClientRect().width
+  const itemW = getItemWidth()
+  const itemsPerPage = Math.max(1, Math.floor(viewport / itemW))
+  const distance = direction * itemsPerPage * (itemW + 16)
+  animateScroll(distance, 1200)
 }
 
-const scrollPrev = () => scrollByPage(-1)
-const scrollNext = () => scrollByPage(1)
+const scrollPrev = () => scrollPage(-1)
+const scrollNext = () => scrollPage(1)
+
+function updateArrowState() {
+  const el = scrollerRef.value
+  if (!el) return
+  const { scrollLeft, scrollWidth, clientWidth } = el
+  const maxScroll = scrollWidth - clientWidth
+  const epsilon = 2
+  canScrollPrev.value = scrollLeft > epsilon
+  canScrollNext.value = scrollLeft < maxScroll - epsilon
+}
+
+function handleViewportChange() {
+  updateArrowState()
+}
+
+onMounted(() => {
+  updateArrowState()
+  scrollerRef.value?.addEventListener('scroll', handleViewportChange, { passive: true })
+  window.addEventListener('resize', handleViewportChange)
+})
+
+onBeforeUnmount(() => {
+  scrollerRef.value?.removeEventListener('scroll', handleViewportChange)
+  window.removeEventListener('resize', handleViewportChange)
+})
+
+watch(
+  () => props.movies,
+  (newMovies) => {
+    if (newMovies && newMovies.length > 0) {
+      requestAnimationFrame(() => {
+        updateArrowState()
+      })
+    }
+  },
+  { immediate: true, deep: true },
+)
+
+function animateScroll(distance, duration = 1200) {
+  const el = scrollerRef.value
+  if (!el) return
+  const start = el.scrollLeft
+  const target = start + distance
+  const t0 = performance.now()
+
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / duration)
+    el.scrollLeft = start + (target - start) * easeOutCubic(p)
+    if (p < 1) {
+      requestAnimationFrame(step)
+    } else {
+      isAnimating.value = false
+      updateArrowState()
+    }
+  }
+
+  isAnimating.value = true
+  requestAnimationFrame(step)
+}
 </script>
 
 <template>
@@ -39,14 +107,25 @@ const scrollNext = () => scrollByPage(1)
     <div class="container">
       <div class="section-header">
         <div class="title-wrap">
-          <span class="dot"></span>
           <div class="titles">
-            <h2 class="section-title">{{ title }}</h2>
-            <p class="section-subtitle">TV shows and movies just for you</p>
+            <h2 class="section-title">
+              {{ title }}
+              <span class="title-arrow" aria-hidden="true">
+                <img src="@/assets/arrow.svg" width="28" height="28" />
+              </span>
+            </h2>
+            <p class="section-subtitle" v-if="subtitle">
+              {{ subtitle }}
+            </p>
           </div>
         </div>
         <div class="controls">
-          <button class="ctrl-btn" aria-label="previous" @click="scrollPrev">
+          <button
+            class="ctrl-btn"
+            :class="{ disabled: !canScrollPrev }"
+            aria-label="previous"
+            @click="scrollPrev"
+          >
             <svg
               width="18"
               height="18"
@@ -63,7 +142,12 @@ const scrollNext = () => scrollByPage(1)
               />
             </svg>
           </button>
-          <button class="ctrl-btn" aria-label="next" @click="scrollNext">
+          <button
+            class="ctrl-btn"
+            :class="{ disabled: !canScrollNext }"
+            aria-label="next"
+            @click="scrollNext"
+          >
             <svg
               width="18"
               height="18"
@@ -84,7 +168,7 @@ const scrollNext = () => scrollByPage(1)
       </div>
 
       <div class="movies-row" v-if="movies.length > 0">
-        <div ref="scrollerEl" class="row-scroller">
+        <div ref="scrollerRef" class="row-scroller" :class="{ 'no-snap': isAnimating }">
           <div class="row-track">
             <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
           </div>
@@ -116,14 +200,6 @@ const scrollNext = () => scrollByPage(1)
 .title-wrap {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background-color: #f5c518;
 }
 
 .titles {
@@ -136,6 +212,25 @@ const scrollNext = () => scrollByPage(1)
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #f5c518;
+  margin-right: 8px;
+  transform: translateY(-1px);
+}
+
+.title-arrow {
+  display: inline-flex;
+  margin-left: 6px;
+  color: #919191;
 }
 
 .section-subtitle {
@@ -164,6 +259,12 @@ const scrollNext = () => scrollByPage(1)
   cursor: pointer;
 }
 
+.ctrl-btn.disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
 .movies-row {
   overflow: hidden;
 }
@@ -172,9 +273,13 @@ const scrollNext = () => scrollByPage(1)
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-snap-type: x mandatory;
 }
+.row-scroller.no-snap {
+  scroll-snap-type: none;
+}
+
 .row-scroller::-webkit-scrollbar {
   display: none;
 }

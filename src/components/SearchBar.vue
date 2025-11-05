@@ -1,5 +1,7 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { api } from '@/services/api'
+import { getImageUrl } from '@/services/api'
 
 const props = defineProps({
   modelValue: {
@@ -13,6 +15,9 @@ const emit = defineEmits(['update:modelValue', 'search', 'type-change'])
 const searchQuery = ref(props.modelValue)
 const selectedType = ref('All')
 const isDropdownOpen = ref(false)
+const isSearchDropdownOpen = ref(false)
+const searchResults = ref({ movies: [], tv: [], people: [] })
+const isLoading = ref(false)
 let debounceTimer = null
 
 const searchTypes = [
@@ -21,6 +26,14 @@ const searchTypes = [
   { value: 'TV Shows', label: 'TV Shows' },
   { value: 'People', label: 'People' },
 ]
+
+const hasResults = computed(() => {
+  return (
+    searchResults.value.movies.length > 0 ||
+    searchResults.value.tv.length > 0 ||
+    searchResults.value.people.length > 0
+  )
+})
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -32,18 +45,60 @@ const selectType = (type) => {
   emit('type-change', type.value)
 }
 
-const closeDropdown = (event) => {
+const performSearch = async (query) => {
+  if (!query.trim()) {
+    searchResults.value = { movies: [], tv: [], people: [] }
+    isSearchDropdownOpen.value = false
+    return
+  }
+
+  isLoading.value = true
+  isSearchDropdownOpen.value = true
+
+  try {
+    if (selectedType.value === 'All') {
+      const [movies, tv, people] = await Promise.all([
+        api.searchMovies(query),
+        api.searchTV(query),
+        api.searchPeople(query),
+      ])
+
+      searchResults.value = {
+        movies: movies || [],
+        tv: tv || [],
+        people: people || [],
+      }
+    } else if (selectedType.value === 'Movies') {
+      const movies = await api.searchMovies(query)
+      searchResults.value = { movies, tv: [], people: [] }
+    } else if (selectedType.value === 'TV Shows') {
+      const tv = await api.searchTV(query)
+      searchResults.value = { movies: [], tv, people: [] }
+    } else if (selectedType.value === 'People') {
+      const people = await api.searchPeople(query)
+      searchResults.value = { movies: [], tv: [], people }
+    }
+  } catch (error) {
+    console.error('Search error:', error)
+    searchResults.value = { movies: [], tv: [], people: [] }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const closeDropdowns = (event) => {
   if (!event.target.closest('.search-bar')) {
     isDropdownOpen.value = false
+    isSearchDropdownOpen.value = false
   }
 }
 
 onMounted(() => {
-  document.addEventListener('click', closeDropdown)
+  document.addEventListener('click', closeDropdowns)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeDropdown)
+  document.removeEventListener('click', closeDropdowns)
 })
 
 watch(searchQuery, (newValue) => {
@@ -55,8 +110,11 @@ watch(searchQuery, (newValue) => {
 
   debounceTimer = setTimeout(() => {
     if (newValue.trim()) {
+      performSearch(newValue.trim())
       emit('search', newValue.trim(), selectedType.value)
     } else {
+      searchResults.value = { movies: [], tv: [], people: [] }
+      isSearchDropdownOpen.value = false
       emit('search', '', selectedType.value)
     }
   }, 300)
@@ -84,17 +142,19 @@ watch(searchQuery, (newValue) => {
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
-      <div v-if="isDropdownOpen" class="dropdown-menu">
-        <button
-          v-for="type in searchTypes"
-          :key="type.value"
-          class="dropdown-item"
-          :class="{ active: selectedType === type.label }"
-          @click="selectType(type)"
-        >
-          {{ type.label }}
-        </button>
-      </div>
+      <transition name="fade-scale">
+        <div v-if="isDropdownOpen" class="dropdown-menu">
+          <button
+            v-for="type in searchTypes"
+            :key="type.value"
+            class="dropdown-item"
+            :class="{ active: selectedType === type.label }"
+            @click="selectType(type)"
+          >
+            {{ type.label }}
+          </button>
+        </div>
+      </transition>
     </div>
     <div class="input-wrapper">
       <input v-model="searchQuery" type="text" class="search-input" placeholder="Search IMDb" />
@@ -119,6 +179,87 @@ watch(searchQuery, (newValue) => {
         </defs>
       </svg>
     </div>
+
+    <!-- Search Results Dropdown -->
+    <transition name="fade-scale">
+      <div v-if="isSearchDropdownOpen && (hasResults || isLoading)" class="search-results-dropdown">
+        <div v-if="isLoading" class="search-loading">Searching...</div>
+        <div v-else class="search-results-content">
+          <div v-if="selectedType === 'All' || selectedType === 'Movies'">
+            <div v-if="searchResults.movies.length > 0" class="results-section">
+              <h4 class="results-title">Movies</h4>
+              <div class="results-list">
+                <div
+                  v-for="movie in searchResults.movies.slice(0, 5)"
+                  :key="movie.id"
+                  class="result-item"
+                >
+                  <img
+                    :src="getImageUrl(movie.poster_path, 'w92')"
+                    :alt="movie.title"
+                    class="result-poster"
+                  />
+                  <div class="result-info">
+                    <p class="result-title">{{ movie.title }}</p>
+                    <p class="result-year">{{ movie.release_date?.split('-')[0] || 'N/A' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="selectedType === 'All' || selectedType === 'TV Shows'">
+            <div v-if="searchResults.tv.length > 0" class="results-section">
+              <h4 class="results-title">TV Shows</h4>
+              <div class="results-list">
+                <div
+                  v-for="show in searchResults.tv.slice(0, 5)"
+                  :key="show.id"
+                  class="result-item"
+                >
+                  <img
+                    :src="getImageUrl(show.poster_path, 'w92')"
+                    :alt="show.name"
+                    class="result-poster"
+                  />
+                  <div class="result-info">
+                    <p class="result-title">{{ show.name }}</p>
+                    <p class="result-year">{{ show.first_air_date?.split('-')[0] || 'N/A' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="selectedType === 'All' || selectedType === 'People'">
+            <div v-if="searchResults.people.length > 0" class="results-section">
+              <h4 class="results-title">People</h4>
+              <div class="results-list">
+                <div
+                  v-for="person in searchResults.people.slice(0, 5)"
+                  :key="person.id"
+                  class="result-item"
+                >
+                  <img
+                    :src="getImageUrl(person.profile_path, 'w92')"
+                    :alt="person.name"
+                    class="result-poster"
+                  />
+                  <div class="result-info">
+                    <p class="result-title">{{ person.name }}</p>
+                    <p class="result-year">
+                      {{ person.known_for_department || 'Actor' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!hasResults && !isLoading" class="no-results">No results found</div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -141,11 +282,11 @@ watch(searchQuery, (newValue) => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background-color: #1a1a1a;
+  background-color: var(--bg-secondary);
   border: none;
   border-right: none;
   border-radius: 10px 0 0 10px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-family: 'Roboto';
   cursor: pointer;
@@ -155,7 +296,7 @@ watch(searchQuery, (newValue) => {
 
 .dropdown-icon {
   transition: transform 0.3s;
-  color: #999;
+  color: var(--text-muted);
 }
 
 .dropdown-icon.open {
@@ -166,7 +307,7 @@ watch(searchQuery, (newValue) => {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  background-color: #1a1a1a;
+  background-color: var(--bg-secondary);
   border-radius: 4px;
   min-width: 120px;
   z-index: 1000;
@@ -181,7 +322,7 @@ watch(searchQuery, (newValue) => {
   text-align: left;
   background: none;
   border: none;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-family: 'Roboto';
   cursor: pointer;
@@ -199,11 +340,11 @@ watch(searchQuery, (newValue) => {
   width: 100%;
   min-width: 200px;
   padding: 0.5rem 2.5rem 0.5rem 1rem;
-  background-color: #1a1a1a;
+  background-color: var(--bg-secondary);
   border: none;
   border-left: none;
   border-radius: 0 10px 10px 0;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   transition: all 0.3s;
   font-family: 'Roboto';
@@ -214,13 +355,121 @@ watch(searchQuery, (newValue) => {
 }
 
 .search-input::placeholder {
-  color: #666;
+  color: var(--text-muted);
 }
 
 .search-icon {
   position: absolute;
   right: 0.75rem;
-  color: #666;
+  color: var(--text-muted);
   pointer-events: none;
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.search-loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.search-results-content {
+  padding: 0.5rem 0;
+}
+
+.results-section {
+  margin-bottom: 1rem;
+}
+
+.results-section:last-child {
+  margin-bottom: 0;
+}
+
+.results-title {
+  padding: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.result-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.result-poster {
+  width: 46px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.result-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-title {
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-year {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.no-results {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* fade+scale transition */
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
 }
 </style>

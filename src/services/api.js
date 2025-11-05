@@ -68,6 +68,32 @@ export const api = {
       return null
     }
   },
+
+  async searchTV(query) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
+      )
+      const data = await response.json()
+      return data.results || []
+    } catch (error) {
+      console.error('Error searching TV shows:', error)
+      return []
+    }
+  },
+
+  async searchPeople(query) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/search/person?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
+      )
+      const data = await response.json()
+      return data.results || []
+    } catch (error) {
+      console.error('Error searching people:', error)
+      return []
+    }
+  },
 }
 
 export const getImageUrl = (path, size = 'w500') => {

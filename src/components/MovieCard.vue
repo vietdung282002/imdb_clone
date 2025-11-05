@@ -17,6 +17,13 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
   <div class="movie-card">
     <div class="poster-wrapper">
       <img :src="posterUrl" :alt="movie.title" class="poster" />
+      <img
+        class="bookmark-icon"
+        src="@/assets/bookmark_btn.svg"
+        width="40"
+        height="50"
+        alt="bookmark"
+      />
     </div>
     <div class="movie-info">
       <h3 class="movie-title">{{ movie.title }}</h3>
@@ -67,6 +74,13 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
   height: 100%;
   object-fit: cover;
   border-radius: 5px;
+}
+
+.bookmark-icon {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  z-index: 2;
 }
 
 .movie-title {
