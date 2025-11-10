@@ -31,10 +31,10 @@ onMounted(() => {
 <style scoped>
 .home {
   min-height: 100vh;
-  color: #fff;
   display: flex;
   flex-direction: column;
   gap: 120px;
+  background: #0e0e0e;
 }
 
 .hero-section {

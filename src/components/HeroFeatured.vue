@@ -121,7 +121,7 @@ function image(path, size = 'w780') {
   bottom: 0;
   height: 300px;
   width: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(to top, rgba(14, 14, 14, 1) 0%, rgba(14, 14, 14, 0) 100%);
   pointer-events: none;
   z-index: 1;
 }

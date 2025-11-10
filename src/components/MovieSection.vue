@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch,} from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import MovieCard from './MovieCard.vue'
 
 const props = defineProps({
@@ -17,7 +17,6 @@ const props = defineProps({
 })
 
 const scrollerRef = ref(null)
-const isAnimating = ref(false)
 const canScrollPrev = ref(false)
 const canScrollNext = ref(false)
 
@@ -34,7 +33,8 @@ function scrollPage(direction = 1) {
   const itemW = getItemWidth()
   const itemsPerPage = Math.max(1, Math.floor(viewport / itemW))
   const distance = direction * itemsPerPage * (itemW + 16)
-  animateScroll(distance, 1200)
+  scrollerRef.value.scrollLeft += distance
+  updateArrowState()
 }
 
 const scrollPrev = () => scrollPage(-1)
@@ -76,30 +76,6 @@ watch(
   },
   { immediate: true, deep: true },
 )
-
-function animateScroll(distance, duration = 1200) {
-  const el = scrollerRef.value
-  if (!el) return
-  const start = el.scrollLeft
-  const target = start + distance
-  const t0 = performance.now()
-
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
-
-  const step = (now) => {
-    const p = Math.min(1, (now - t0) / duration)
-    el.scrollLeft = start + (target - start) * easeOutCubic(p)
-    if (p < 1) {
-      requestAnimationFrame(step)
-    } else {
-      isAnimating.value = false
-      updateArrowState()
-    }
-  }
-
-  isAnimating.value = true
-  requestAnimationFrame(step)
-}
 </script>
 
 <template>
@@ -168,13 +144,13 @@ function animateScroll(distance, duration = 1200) {
       </div>
 
       <div class="movies-row" v-if="movies.length > 0">
-        <div ref="scrollerRef" class="row-scroller" :class="{ 'no-snap': isAnimating }">
+        <div ref="scrollerRef" class="row-scroller">
           <div class="row-track">
             <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
           </div>
         </div>
       </div>
-      <div v-else class="loading">Loading...</div>
+      <div v-else></div>
     </div>
   </section>
 </template>
@@ -276,9 +252,6 @@ function animateScroll(distance, duration = 1200) {
   scroll-behavior: auto;
   scroll-snap-type: x mandatory;
 }
-.row-scroller.no-snap {
-  scroll-snap-type: none;
-}
 
 .row-scroller::-webkit-scrollbar {
   display: none;
@@ -293,12 +266,6 @@ function animateScroll(distance, duration = 1200) {
 .row-track > * {
   flex: 0 0 220px;
   scroll-snap-align: start;
-}
-
-.loading {
-  color: #999;
-  text-align: center;
-  padding: 2rem;
 }
 
 @media (max-width: 768px) {

@@ -1,12 +1,14 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import AppHeader from './components/AppHeader.vue'
+import AppFooter from './components/AppFooter.vue'
 </script>
 
 <template>
   <div id="app">
     <AppHeader />
     <RouterView />
+    <AppFooter />
   </div>
 </template>
 
@@ -18,7 +20,6 @@ import AppHeader from './components/AppHeader.vue'
 }
 
 :root {
-  /* Dark mode colors (default) */
   --bg-primary: #000;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #242424;
