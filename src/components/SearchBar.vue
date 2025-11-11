@@ -269,7 +269,7 @@ watch(searchQuery, (newValue) => {
   display: flex;
   align-items: center;
   flex: 1;
-  max-width: 500px;
+  max-width: 100%;
   gap: 0;
 }
 

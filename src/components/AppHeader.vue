@@ -131,7 +131,7 @@ const handleSearch = (query) => {
 
 <style scoped>
 .header {
-  background-color: var(--bg-primary);
+  background-color: #000;
   color: var(--text-primary);
   padding: 1rem 0;
   position: sticky;
@@ -144,7 +144,7 @@ const handleSearch = (query) => {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 0 1rem;
 }

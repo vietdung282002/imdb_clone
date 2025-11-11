@@ -31,7 +31,7 @@ import AppFooter from './components/AppFooter.vue'
 }
 
 .dark {
-  --bg-primary: #000;
+  --bg-primary: #0e0e0e;
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #242424;
   --text-primary: #fff;

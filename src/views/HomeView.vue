@@ -1,30 +1,41 @@
 <script setup>
 import { onMounted } from 'vue'
-import MovieSection from '@/components/MovieSection.vue'
+import ContentSection from '@/components/ContentSection.vue'
 import { useMovieStore } from '@/stores/movie'
+import { usePeopleStore } from '@/stores/people'
 import HeroFeatured from '@/components/HeroFeatured.vue'
+import PersonCard from '@/components/PersonCard.vue'
 
 const movieStore = useMovieStore()
+const peopleStore = usePeopleStore()
 
 onMounted(() => {
   movieStore.fetchAll()
+  peopleStore.fetchPopular()
 })
 </script>
 
 <template>
   <main class="home">
     <HeroFeatured :movies="movieStore.popular" />
-    <MovieSection
+    <ContentSection
       title="Top Picks"
       subtitle="TV shows and movies just for you"
-      :movies="movieStore.popular"
+      :content="movieStore.popular"
+      watermarkText="What to Watch"
     />
-    <MovieSection title="Top on IMDb this week" :movies="movieStore.nowPlaying" />
-    <MovieSection
+    <ContentSection title="Top on IMDb this week" :content="movieStore.nowPlaying" />
+    <ContentSection
       title="IMDb Originals"
       subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
-      :movies="movieStore.upcoming"
+      :content="movieStore.upcoming"
+      watermarkText="Videos"
     />
+    <ContentSection title="Born Today" :content="peopleStore.popular" subtitle="People born today">
+      <template #card="{ movie }">
+        <PersonCard :person="movie" />
+      </template>
+    </ContentSection>
   </main>
 </template>
 
@@ -34,7 +45,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 120px;
-  background: #0e0e0e;
+  padding-bottom: 120px;
 }
 
 .hero-section {

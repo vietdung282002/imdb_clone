@@ -50,6 +50,7 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
 
 <style scoped>
 .movie-card {
+  width: 220px;
   background-color: rgba(163, 163, 163, 0.05);
   border-radius: 10px;
   overflow: hidden;

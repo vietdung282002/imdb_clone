@@ -212,7 +212,7 @@
 
 <style scoped>
 .app-footer {
-  background-color: var(--bg-primary);
+  background-color: #000;
   color: var(--accent-color);
   padding: 3rem 0;
 }

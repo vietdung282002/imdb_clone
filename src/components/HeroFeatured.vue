@@ -89,12 +89,12 @@ function image(path, size = 'w780') {
 }
 
 .hero-inner {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 0 16px;
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 16px;
+  grid-template-columns: 1fr 370px;
+  gap: 32px;
 }
 
 .hero-main {

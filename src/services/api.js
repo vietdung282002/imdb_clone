@@ -94,6 +94,27 @@ export const api = {
       return []
     }
   },
+
+  async getPopularPeople() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/person/popular?api_key=${API_KEY}`)
+      const data = await response.json()
+      return data.results || []
+    } catch (error) {
+      console.error('Error fetching popular people:', error)
+      return []
+    }
+  },
+
+  async getPersonDetails(personId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/person/${personId}?api_key=${API_KEY}`)
+      return await response.json()
+    } catch (error) {
+      console.error('Error fetching person details:', error)
+      return null
+    }
+  },
 }
 
 export const getImageUrl = (path, size = 'w500') => {
