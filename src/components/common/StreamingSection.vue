@@ -1,28 +1,38 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import MovieCard from './MovieCard.vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import { useMovieStore } from '@/stores/movie'
+import VerticalMovieCard from '@/components/movie/VerticalMovieCard.vue'
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  subtitle: {
-    type: String,
-  },
-  content: {
-    type: Array,
-    default: () => [],
-  },
-  watermarkText: {
-    type: String,
-    default: '',
-  },
+const movieStore = useMovieStore()
+
+const streamingServices = [
+  { id: 'prime', name: 'Prime Video' },
+  { id: 'disney', name: 'Disney+' },
+  { id: 'hulu', name: 'Hulu' },
+  { id: 'netflix', name: 'Netflix' },
+  { id: 'hbo', name: 'HBO Max' },
+]
+
+const selectedService = ref('prime')
+
+const currentContent = computed(() => {
+  return movieStore.streaming[selectedService.value] || []
 })
 
 const scrollerRef = ref(null)
+const tabsScrollerRef = ref(null)
 const canScrollPrev = ref(false)
 const canScrollNext = ref(false)
+const canScrollTabsPrev = ref(false)
+const canScrollTabsNext = ref(false)
+
+const scrollPositions = ref({
+  prime: 0,
+  disney: 0,
+  hulu: 0,
+  netflix: 0,
+  hbo: 0,
+})
 
 function getItemWidth() {
   const track = scrollerRef.value?.querySelector('.row-track')
@@ -54,53 +64,89 @@ function updateArrowState() {
   canScrollNext.value = scrollLeft < maxScroll - epsilon
 }
 
+function updateTabsArrowState() {
+  const el = tabsScrollerRef.value
+  if (!el) return
+  const { scrollLeft, scrollWidth, clientWidth } = el
+  const maxScroll = scrollWidth - clientWidth
+  const epsilon = 2
+  canScrollTabsPrev.value = scrollLeft > epsilon
+  canScrollTabsNext.value = scrollLeft < maxScroll - epsilon
+}
+
 function handleViewportChange() {
+  if (scrollerRef.value) {
+    scrollPositions.value[selectedService.value] = scrollerRef.value.scrollLeft
+  }
   updateArrowState()
+  updateTabsArrowState()
 }
 
 onMounted(() => {
+  if (movieStore.streaming.prime.length === 0) {
+    movieStore.fetchStreamingMovies()
+  }
   updateArrowState()
+  updateTabsArrowState()
   scrollerRef.value?.addEventListener('scroll', handleViewportChange, { passive: true })
+  tabsScrollerRef.value?.addEventListener('scroll', handleViewportChange, { passive: true })
   window.addEventListener('resize', handleViewportChange)
 })
 
 onBeforeUnmount(() => {
   scrollerRef.value?.removeEventListener('scroll', handleViewportChange)
+  tabsScrollerRef.value?.removeEventListener('scroll', handleViewportChange)
   window.removeEventListener('resize', handleViewportChange)
 })
 
 watch(
-  () => props.content,
+  () => currentContent.value,
   (newMovies) => {
     if (newMovies && newMovies.length > 0) {
       requestAnimationFrame(() => {
+        if (scrollerRef.value) {
+          scrollerRef.value.scrollLeft = scrollPositions.value[selectedService.value] || 0
+        }
         updateArrowState()
       })
     }
   },
   { immediate: true, deep: true },
 )
+
+watch(
+  () => selectedService.value,
+  (newService, oldService) => {
+    if (oldService && scrollerRef.value) {
+      scrollPositions.value[oldService] = scrollerRef.value.scrollLeft
+    }
+    requestAnimationFrame(() => {
+      if (scrollerRef.value) {
+        scrollerRef.value.scrollLeft = scrollPositions.value[newService] || 0
+      }
+      updateArrowState()
+    })
+  },
+)
 </script>
 
 <template>
   <div class="content-section-wrapper">
-    <div v-if="watermarkText" class="watermark-text">
-      {{ watermarkText }}
-    </div>
-    <section class="content-section" :class="{ 'has-watermark': watermarkText }">
+    <div class="watermark-text">Streaming Now</div>
+    <section class="content-section">
       <div class="container">
-        <div class="section-header">
-          <div class="title-wrap">
-            <div class="titles">
-              <h2 class="section-title">
-                {{ title }}
-                <span class="title-arrow" aria-hidden="true">
-                  <img src="@/assets/arrow.svg" width="28" height="28" />
-                </span>
-              </h2>
-              <p class="section-subtitle" v-if="subtitle">
-                {{ subtitle }}
-              </p>
+        <div class="streaming-tabs-wrapper">
+          <div ref="tabsScrollerRef" class="tabs-scroller">
+            <div class="tabs-container">
+              <button
+                v-for="service in streamingServices"
+                :key="service.id"
+                class="streaming-tab"
+                :class="{ active: selectedService === service.id }"
+                @click="selectedService = service.id"
+              >
+                {{ service.name }}
+              </button>
             </div>
           </div>
           <div class="controls">
@@ -151,18 +197,18 @@ watch(
           </div>
         </div>
 
-        <div class="movies-row" v-if="content.length > 0">
+        <div class="movies-row" v-if="currentContent.length > 0">
           <div ref="scrollerRef" class="row-scroller">
             <div class="row-track">
-              <template v-for="movie in content" :key="movie.id">
+              <template v-for="movie in currentContent" :key="movie.id">
                 <slot name="card" :movie="movie">
-                  <MovieCard :movie="movie" />
+                  <VerticalMovieCard :movie="movie" :hasPlayButton="false" />
                 </slot>
               </template>
             </div>
           </div>
         </div>
-        <div v-else></div>
+        <div v-else class="empty-state"></div>
       </div>
     </section>
   </div>
@@ -197,67 +243,13 @@ watch(
 .content-section {
   position: relative;
   z-index: 1;
-  margin-top: 0;
-}
-
-.content-section.has-watermark {
-  margin-top: 70px;
+  margin-top: 170px;
 }
 
 .container {
   max-width: 1500px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.title-wrap {
-  display: flex;
-  align-items: center;
-}
-
-.titles {
-  display: flex;
-  flex-direction: column;
-}
-
-.section-title {
-  color: #fff;
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.2;
-  display: inline-flex;
-  align-items: center;
-}
-
-.section-title::before {
-  content: '';
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background-color: #f5c518;
-  margin-right: 8px;
-  transform: translateY(-1px);
-}
-
-.title-arrow {
-  display: inline-flex;
-  margin-left: 6px;
-  color: #919191;
-}
-
-.section-subtitle {
-  margin: 0;
-  margin-top: 2px;
-  color: #919191;
-  font-size: 0.875rem;
 }
 
 .controls {
@@ -277,12 +269,65 @@ watch(
   background-color: #1a1a1a;
   color: #bdbdbd;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ctrl-btn:hover:not(.disabled) {
+  background-color: #2a2a2a;
+  border-color: #3f3f3f;
 }
 
 .ctrl-btn.disabled {
   opacity: 0.35;
   cursor: default;
   pointer-events: none;
+}
+
+.streaming-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabs-scroller {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
+.tabs-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.tabs-container {
+  width: fit-content;
+  display: flex;
+  gap: 2rem;
+  padding: 9px;
+  background-color: #1a1a1a;
+  border-radius: 18px;
+}
+
+.streaming-tab {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: none;
+  color: #c3c3c3;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.streaming-tab.active {
+  background-color: #f5c518;
+  color: #121212;
+  font-weight: 500;
 }
 
 .movies-row {
@@ -312,9 +357,20 @@ watch(
   scroll-snap-align: start;
 }
 
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #919191;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
 @media (max-width: 768px) {
-  .row-inner {
-    grid-template-columns: repeat(3, minmax(140px, 1fr));
+  .streaming-tabs-wrapper {
+    flex-wrap: wrap;
   }
 }
 </style>

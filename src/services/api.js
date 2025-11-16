@@ -1,118 +1,114 @@
 const API_KEY = import.meta.env.VITE_API_KEY || 'a78465ca31af77ddc48dc5e525d629ba'
 const API_BASE_URL = 'https://api.themoviedb.org/3'
 
+async function fetchAPI(endpoint, errorMessage, additionalParams = '') {
+  try {
+    const separator = endpoint.includes('?') ? '&' : '?'
+    const url = `${API_BASE_URL}${endpoint}${separator}api_key=${API_KEY}${additionalParams}`
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+    return data.results || []
+  } catch (error) {
+    console.error(errorMessage, error)
+    return []
+  }
+}
+
+async function fetchDetailAPI(endpoint, errorMessage) {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}?api_key=${API_KEY}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return await response.json()
+  } catch (error) {
+    console.error(errorMessage, error)
+    return null
+  }
+}
+
 export const api = {
   async getPopularMovies() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/movie/popular?api_key=${API_KEY}`)
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error fetching popular movies:', error)
-      return []
-    }
+    return fetchAPI('/movie/popular', 'Error fetching popular movies:')
   },
 
   async getNowPlayingMovies() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/movie/now_playing?api_key=${API_KEY}`)
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error fetching now playing movies:', error)
-      return []
-    }
+    return fetchAPI('/movie/now_playing', 'Error fetching now playing movies:')
   },
 
   async getUpcomingMovies() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/movie/upcoming?api_key=${API_KEY}`)
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error fetching upcoming movies:', error)
-      return []
-    }
+    return fetchAPI('/movie/upcoming', 'Error fetching upcoming movies:')
   },
 
   async getTopRatedMovies() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/movie/top_rated?api_key=${API_KEY}`)
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error fetching top rated movies:', error)
-      return []
-    }
+    return fetchAPI('/movie/top_rated', 'Error fetching top rated movies:')
   },
 
   async searchMovies(query) {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
-      )
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error searching movies:', error)
-      return []
-    }
+    return fetchAPI(
+      '/search/movie',
+      'Error searching movies:',
+      `&query=${encodeURIComponent(query)}`,
+    )
   },
 
   async getMovieDetails(movieId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/movie/${movieId}?api_key=${API_KEY}`)
-      return await response.json()
-    } catch (error) {
-      console.error('Error fetching movie details:', error)
-      return null
-    }
+    return fetchDetailAPI(`/movie/${movieId}`, 'Error fetching movie details:')
   },
 
   async searchTV(query) {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
-      )
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error searching TV shows:', error)
-      return []
-    }
+    return fetchAPI(
+      '/search/tv',
+      'Error searching TV shows:',
+      `&query=${encodeURIComponent(query)}`,
+    )
   },
 
   async searchPeople(query) {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/search/person?api_key=${API_KEY}&query=${encodeURIComponent(query)}`,
-      )
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error searching people:', error)
-      return []
-    }
+    return fetchAPI(
+      '/search/person',
+      'Error searching people:',
+      `&query=${encodeURIComponent(query)}`,
+    )
   },
 
   async getPopularPeople() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/person/popular?api_key=${API_KEY}`)
-      const data = await response.json()
-      return data.results || []
-    } catch (error) {
-      console.error('Error fetching popular people:', error)
-      return []
-    }
+    return fetchAPI('/person/popular', 'Error fetching popular people:')
   },
 
   async getPersonDetails(personId) {
+    return fetchDetailAPI(`/person/${personId}`, 'Error fetching person details:')
+  },
+
+  async getMoviesByProvider(providerId, page = 1) {
+    return fetchAPI(
+      '/discover/movie',
+      `Error fetching movies for provider ${providerId}:`,
+      `&with_watch_providers=${providerId}&page=${page}`,
+    )
+  },
+}
+
+const NEWS_API_KEY = 'ae836011cdc14179be41c06f687302b4'
+const NEWS_API_URL = 'https://newsapi.org/v2'
+
+export const newsApi = {
+  async searchNews(query, pageSize = 10) {
     try {
-      const response = await fetch(`${API_BASE_URL}/person/${personId}?api_key=${API_KEY}`)
-      return await response.json()
+      const response = await fetch(
+        `${NEWS_API_URL}/everything?q=${encodeURIComponent(query)}&apiKey=${NEWS_API_KEY}&pageSize=${pageSize}&sortBy=publishedAt&language=en`,
+      )
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      return data.articles || []
     } catch (error) {
-      console.error('Error fetching person details:', error)
-      return null
+      console.error('Error fetching news:', error)
+      return []
     }
   },
 }

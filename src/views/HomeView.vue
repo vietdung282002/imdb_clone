@@ -1,16 +1,23 @@
 <script setup>
 import { onMounted } from 'vue'
-import ContentSection from '@/components/ContentSection.vue'
+import ContentSection from '@/components/common/ContentSection.vue'
 import { useMovieStore } from '@/stores/movie'
 import { usePeopleStore } from '@/stores/people'
-import HeroFeatured from '@/components/HeroFeatured.vue'
-import PersonCard from '@/components/PersonCard.vue'
+import HeroFeatured from '@/components/movie/HeroFeatured.vue'
+import PersonCard from '@/components/people/PersonCard.vue'
+import HorizontalMovieCard from '@/components/movie/HorizontalMovieCard.vue'
+import StreamingSection from '@/components/common/StreamingSection.vue'
+import BoxOfficeSection from '@/components/common/BoxOfficeSection.vue'
+import MovieNewsCard from '@/components/movie/MovieNewsCard.vue'
 
 const movieStore = useMovieStore()
 const peopleStore = usePeopleStore()
 
 onMounted(() => {
   movieStore.fetchAll()
+  movieStore.fetchStreamingMovies()
+  movieStore.fetchBoxOffice()
+  movieStore.fetchMovieNews()
   peopleStore.fetchPopular()
 })
 </script>
@@ -25,15 +32,36 @@ onMounted(() => {
       watermarkText="What to Watch"
     />
     <ContentSection title="Top on IMDb this week" :content="movieStore.nowPlaying" />
+    <BoxOfficeSection
+      title="Top box office (US)"
+      subtitle="Weekend of March 8-10"
+      :content="movieStore.boxOffice"
+      watermarkText="Explore"
+    />
     <ContentSection
       title="IMDb Originals"
       subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
-      :content="movieStore.upcoming"
+      :content="movieStore.topRated"
       watermarkText="Videos"
-    />
+    >
+      <template #card="{ movie }">
+        <HorizontalMovieCard :movie="movie" />
+      </template>
+    </ContentSection>
+    <StreamingSection />
+    <ContentSection subtitle="Trailers for Upcoming Releases" :content="movieStore.upcoming">
+      <template #card="{ movie }">
+        <HorizontalMovieCard :movie="movie" :showReleaseDate="true" />
+      </template>
+    </ContentSection>
     <ContentSection title="Born Today" :content="peopleStore.popular" subtitle="People born today">
       <template #card="{ movie }">
         <PersonCard :person="movie" />
+      </template>
+    </ContentSection>
+    <ContentSection title="Top News" :content="movieStore.news">
+      <template #card="{ movie: article }">
+        <MovieNewsCard :article="article" />
       </template>
     </ContentSection>
   </main>

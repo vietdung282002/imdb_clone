@@ -180,7 +180,6 @@ watch(searchQuery, (newValue) => {
       </svg>
     </div>
 
-    <!-- Search Results Dropdown -->
     <transition name="fade-scale">
       <div v-if="isSearchDropdownOpen && (hasResults || isLoading)" class="search-results-dropdown">
         <div v-if="isLoading" class="search-loading">Searching...</div>
@@ -460,7 +459,6 @@ watch(searchQuery, (newValue) => {
   font-size: 0.875rem;
 }
 
-/* fade+scale transition */
 .fade-scale-enter-active,
 .fade-scale-leave-active {
   transition:

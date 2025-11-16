@@ -7,6 +7,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  hasPlayButton: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const posterUrl = computed(() => getImageUrl(props.movie.poster_path))
@@ -40,7 +44,7 @@ const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
           <img src="@/assets/info.svg" width="20" height="20" />
         </div>
       </div>
-      <button class="trailer-btn">
+      <button class="trailer-btn" v-if="hasPlayButton">
         <img src="@/assets/play.svg" width="24" height="24" />
         <span>Trailer</span>
       </button>

@@ -13,7 +13,6 @@ export const usePeopleStore = defineStore('people', {
       this.error = null
       try {
         const people = await api.getPopularPeople()
-        // Fetch details for first 20 people to get birthday
         const peopleWithDetails = await Promise.all(
           people.slice(0, 20).map(async (person) => {
             const details = await api.getPersonDetails(person.id)

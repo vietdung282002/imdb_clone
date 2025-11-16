@@ -1,8 +1,8 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { ref, onMounted, onUnmounted } from 'vue'
-import SearchBar from './SearchBar.vue'
-import ThemeToggle from './ThemeToggle.vue'
+import SearchBar from '../common/SearchBar.vue'
+import ThemeToggle from '../common/ThemeToggle.vue'
 
 const tabs = [
   { name: 'Movies', route: '/movies' },
@@ -43,10 +43,7 @@ onUnmounted(() => {
   document.removeEventListener('click', closeLanguage)
 })
 
-const handleSearch = (query) => {
-  console.log('Searching for:', query)
-  // Có thể thêm logic xử lý search ở đây
-}
+const handleSearch = () => {}
 </script>
 
 <template>
