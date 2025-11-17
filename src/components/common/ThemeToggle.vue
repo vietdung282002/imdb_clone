@@ -1,40 +1,6 @@
-<script setup>
-import { useThemeStore } from '@/stores/theme'
-
-const themeStore = useThemeStore()
-</script>
-
 <template>
-  <button
-    class="theme-toggle"
-    @click="themeStore.toggleTheme"
-    :aria-label="`Switch to ${themeStore.isDark ? 'light' : 'dark'} mode`"
-  >
+  <button class="theme-toggle" type="button" aria-label="Theme toggle button">
     <svg
-      v-if="themeStore.isDark"
-      class="icon"
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-    <svg
-      v-else
       class="icon"
       width="24"
       height="24"
@@ -62,11 +28,6 @@ const themeStore = useThemeStore()
   justify-content: center;
   transition: all 0.3s;
   border-radius: 4px;
-}
-
-.theme-toggle:hover {
-  color: var(--accent-color);
-  background-color: rgba(245, 197, 24, 0.1);
 }
 
 .icon {

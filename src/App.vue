@@ -30,28 +30,6 @@ import AppFooter from './components/layout/AppFooter.vue'
   --border-color: #333;
 }
 
-.dark {
-  --bg-primary: #0e0e0e;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #242424;
-  --text-primary: #fff;
-  --text-secondary: #c3c3c3;
-  --text-muted: #666;
-  --accent-color: #f5c518;
-  --border-color: #333;
-}
-
-.light {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-tertiary: #e5e5e5;
-  --text-primary: #000;
-  --text-secondary: #333;
-  --text-muted: #666;
-  --accent-color: #f5c518;
-  --border-color: #ddd;
-}
-
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans',
