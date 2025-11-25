@@ -126,51 +126,31 @@ watch(searchQuery, (newValue) => {
     <div class="dropdown-wrapper">
       <button class="dropdown-button" @click="toggleDropdown">
         <span>{{ selectedType }}</span>
-        <svg
-          class="dropdown-icon"
-          :class="{ open: isDropdownOpen }"
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="dropdown-icon"
+          :class="{ open: isDropdownOpen }" viewBox="0 0 24 24" fill="#000" role="presentation">
+          <path fill="none" d="M0 0h24v24H0V0z"></path>
+          <path
+            d="M8.71 11.71l2.59 2.59c.39.39 1.02.39 1.41 0l2.59-2.59c.63-.63.18-1.71-.71-1.71H9.41c-.89 0-1.33 1.08-.7 1.71z">
+          </path>
         </svg>
       </button>
       <transition name="fade-scale">
         <div v-if="isDropdownOpen" class="dropdown-menu">
-          <button
-            v-for="type in searchTypes"
-            :key="type.value"
-            class="dropdown-item"
-            :class="{ active: selectedType === type.label }"
-            @click="selectType(type)"
-          >
+          <button v-for="type in searchTypes" :key="type.value" class="dropdown-item"
+            :class="{ active: selectedType === type.label }" @click="selectType(type)">
             {{ type.label }}
           </button>
         </div>
       </transition>
     </div>
     <div class="input-wrapper">
-      <input v-model="searchQuery" type="text" class="search-input" placeholder="Search IMDb" />
-      <svg
-        class="search-icon"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <input v-model="searchQuery" type="text" class="search-input" />
+      <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_search)">
           <path
             d="M15.5006 14.0006H14.7106L14.4306 13.7306C15.6306 12.3306 16.2506 10.4206 15.9106 8.39063C15.4406 5.61063 13.1206 3.39063 10.3206 3.05063C6.09063 2.53063 2.53063 6.09063 3.05063 10.3206C3.39063 13.1206 5.61063 15.4406 8.39063 15.9106C10.4206 16.2506 12.3306 15.6306 13.7306 14.4306L14.0006 14.7106V15.5006L18.2506 19.7506C18.6606 20.1606 19.3306 20.1606 19.7406 19.7506C20.1506 19.3406 20.1506 18.6706 19.7406 18.2606L15.5006 14.0006ZM9.50063 14.0006C7.01063 14.0006 5.00063 11.9906 5.00063 9.50063C5.00063 7.01063 7.01063 5.00063 9.50063 5.00063C11.9906 5.00063 14.0006 7.01063 14.0006 9.50063C14.0006 11.9906 11.9906 14.0006 9.50063 14.0006Z"
-            fill="currentColor"
-          />
+            fill="currentColor" />
         </g>
         <defs>
           <clipPath id="clip0_search">
@@ -188,16 +168,8 @@ watch(searchQuery, (newValue) => {
             <div v-if="searchResults.movies.length > 0" class="results-section">
               <h4 class="results-title">Movies</h4>
               <div class="results-list">
-                <div
-                  v-for="movie in searchResults.movies.slice(0, 5)"
-                  :key="movie.id"
-                  class="result-item"
-                >
-                  <img
-                    :src="getImageUrl(movie.poster_path, 'w92')"
-                    :alt="movie.title"
-                    class="result-poster"
-                  />
+                <div v-for="movie in searchResults.movies.slice(0, 5)" :key="movie.id" class="result-item">
+                  <img :src="getImageUrl(movie.poster_path, 'w92')" :alt="movie.title" class="result-poster" />
                   <div class="result-info">
                     <p class="result-title">{{ movie.title }}</p>
                     <p class="result-year">{{ movie.release_date?.split('-')[0] || 'N/A' }}</p>
@@ -211,16 +183,8 @@ watch(searchQuery, (newValue) => {
             <div v-if="searchResults.tv.length > 0" class="results-section">
               <h4 class="results-title">TV Shows</h4>
               <div class="results-list">
-                <div
-                  v-for="show in searchResults.tv.slice(0, 5)"
-                  :key="show.id"
-                  class="result-item"
-                >
-                  <img
-                    :src="getImageUrl(show.poster_path, 'w92')"
-                    :alt="show.name"
-                    class="result-poster"
-                  />
+                <div v-for="show in searchResults.tv.slice(0, 5)" :key="show.id" class="result-item">
+                  <img :src="getImageUrl(show.poster_path, 'w92')" :alt="show.name" class="result-poster" />
                   <div class="result-info">
                     <p class="result-title">{{ show.name }}</p>
                     <p class="result-year">{{ show.first_air_date?.split('-')[0] || 'N/A' }}</p>
@@ -234,16 +198,8 @@ watch(searchQuery, (newValue) => {
             <div v-if="searchResults.people.length > 0" class="results-section">
               <h4 class="results-title">People</h4>
               <div class="results-list">
-                <div
-                  v-for="person in searchResults.people.slice(0, 5)"
-                  :key="person.id"
-                  class="result-item"
-                >
-                  <img
-                    :src="getImageUrl(person.profile_path, 'w92')"
-                    :alt="person.name"
-                    class="result-poster"
-                  />
+                <div v-for="person in searchResults.people.slice(0, 5)" :key="person.id" class="result-item">
+                  <img :src="getImageUrl(person.profile_path, 'w92')" :alt="person.name" class="result-poster" />
                   <div class="result-info">
                     <p class="result-title">{{ person.name }}</p>
                     <p class="result-year">
@@ -270,27 +226,31 @@ watch(searchQuery, (newValue) => {
   flex: 1;
   max-width: 100%;
   gap: 0;
+  height: 2rem;
+  margin: 0px 0.5rem;
 }
 
 .dropdown-wrapper {
   position: relative;
+  height: 2rem;
 }
 
 .dropdown-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--bg-secondary);
+  padding: 0px 0.25rem 0px 0.75rem;
+  background-color: #fff;
   border: none;
   border-right: none;
-  border-radius: 10px 0 0 10px;
-  color: var(--text-primary);
+  border-radius: 4px 0 0 4px;
+  color: #000;
   font-size: 0.875rem;
   font-family: 'Roboto';
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
   white-space: nowrap;
+  height: 2rem;
 }
 
 .dropdown-icon {
@@ -306,7 +266,7 @@ watch(searchQuery, (newValue) => {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  background-color: var(--bg-secondary);
+  background-color: #fff;
   border-radius: 4px;
   min-width: 120px;
   z-index: 1000;
@@ -321,7 +281,7 @@ watch(searchQuery, (newValue) => {
   text-align: left;
   background: none;
   border: none;
-  color: var(--text-primary);
+  color: #000;
   font-size: 0.875rem;
   font-family: 'Roboto';
   cursor: pointer;
@@ -333,20 +293,23 @@ watch(searchQuery, (newValue) => {
   flex: 1;
   display: flex;
   align-items: center;
+  height: 2rem;
 }
 
 .search-input {
   width: 100%;
   min-width: 200px;
-  padding: 0.5rem 2.5rem 0.5rem 1rem;
-  background-color: var(--bg-secondary);
+  padding: 0.375em 0px 0.375rem 0.5rem;
+  background-color: #fff;
   border: none;
-  border-left: none;
-  border-radius: 0 10px 10px 0;
-  color: var(--text-primary);
+  border-left: 1px solid #000;
+  border-radius: 0 4px 4px 0;
+  color: #000;
   font-size: 0.875rem;
   transition: all 0.3s;
   font-family: 'Roboto';
+  font-weight: 400;
+  height: 2rem;
 }
 
 .search-input:focus {
@@ -370,7 +333,7 @@ watch(searchQuery, (newValue) => {
   left: 0;
   right: 0;
   background-color: var(--bg-secondary);
-  border-radius: 8px;
+  border-radius: 4px;
   max-height: 500px;
   overflow-y: auto;
   z-index: 1000;
@@ -408,6 +371,14 @@ watch(searchQuery, (newValue) => {
 .results-list {
   display: flex;
   flex-direction: column;
+}
+
+.results-list .result-item {
+  border-top: 0.5px solid #e0e0e0;
+}
+
+.results-list .result-item:first-child {
+  border-top: none;
 }
 
 .result-item {
@@ -465,6 +436,7 @@ watch(searchQuery, (newValue) => {
     opacity 0.15s ease,
     transform 0.15s ease;
 }
+
 .fade-scale-enter-from,
 .fade-scale-leave-to {
   opacity: 0;

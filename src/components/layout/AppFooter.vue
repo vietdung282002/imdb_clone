@@ -240,7 +240,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto';
 }
 
 .footer-content {

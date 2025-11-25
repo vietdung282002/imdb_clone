@@ -74,7 +74,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 120px;
   padding-bottom: 120px;
-  background-color: #0e0e0e;
+  background-color: #000;
 }
 
 .hero-section {
