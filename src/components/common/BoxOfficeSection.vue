@@ -14,10 +14,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  watermarkText: {
-    type: String,
-    default: '',
-  },
 })
 
 const displayMovies = computed(() => {
@@ -27,10 +23,7 @@ const displayMovies = computed(() => {
 
 <template>
   <div class="content-section-wrapper">
-    <div v-if="watermarkText" class="watermark-text">
-      {{ watermarkText }}
-    </div>
-    <section class="content-section" :class="{ 'has-watermark': watermarkText }">
+    <section class="content-section">
       <div class="container">
         <div class="section-header">
           <div class="title-wrap">
@@ -49,12 +42,7 @@ const displayMovies = computed(() => {
         </div>
 
         <div class="box-office-grid" v-if="displayMovies.length > 0">
-          <BoxOfficeCard
-            v-for="(movie, index) in displayMovies"
-            :key="movie.id"
-            :movie="movie"
-            :rank="index + 1"
-          />
+          <BoxOfficeCard v-for="(movie, index) in displayMovies" :key="movie.id" :movie="movie" :rank="index + 1" />
         </div>
         <div v-else class="empty-state">
           <p>Không có dữ liệu box office</p>
@@ -69,39 +57,14 @@ const displayMovies = computed(() => {
   position: relative;
 }
 
-.watermark-text {
-  margin-top: 0;
-  font-size: 10rem;
-  font-weight: 700;
-  color: rgba(195, 195, 195, 0.1);
-  text-transform: uppercase;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 0;
-  pointer-events: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1;
-  text-align: center;
-  max-width: 1500px;
-  margin: 0 auto;
-}
-
 .content-section {
   position: relative;
   z-index: 1;
   margin-top: 0;
 }
 
-.content-section.has-watermark {
-  margin-top: 70px;
-}
-
 .container {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
 }

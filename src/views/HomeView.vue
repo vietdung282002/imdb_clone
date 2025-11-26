@@ -29,20 +29,17 @@ onMounted(() => {
       title="Top Picks"
       subtitle="TV shows and movies just for you"
       :content="movieStore.popular"
-      watermarkText="What to Watch"
     />
     <ContentSection title="Top on IMDb this week" :content="movieStore.nowPlaying" />
     <BoxOfficeSection
       title="Top box office (US)"
       subtitle="Weekend of March 8-10"
       :content="movieStore.boxOffice"
-      watermarkText="Explore"
     />
     <ContentSection
       title="IMDb Originals"
       subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
       :content="movieStore.topRated"
-      watermarkText="Videos"
     >
       <template #card="{ movie }">
         <HorizontalMovieCard :movie="movie" />

@@ -22,22 +22,13 @@ function image(path, size = 'w780') {
   <section class="hero">
     <div class="hero-inner" v-if="hero">
       <div class="hero-main-wrapper">
-        <div
-          class="hero-main"
-          :style="{ backgroundImage: `url(${image(hero.backdrop_path, 'w1280')})` }"
-        >
+        <div class="hero-main" :style="{ backgroundImage: `url(${image(hero.backdrop_path, 'w1280')})` }">
           <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
           <div class="poster">
             <img class="poster-img" :src="image(hero.poster_path, 'w342')" :alt="hero.title" />
-            <img
-              class="bookmark-icon"
-              src="@/assets/bookmark_btn.svg"
-              width="40"
-              height="50"
-              alt="bookmark"
-            />
+            <img class="bookmark-icon" src="@/assets/bookmark_btn.svg" width="40" height="50" alt="bookmark" />
           </div>
           <div class="text">
             <img src="@/assets/play_btn.svg" width="120" height="120" />
@@ -57,20 +48,9 @@ function image(path, size = 'w780') {
 
           <button class="browse-btn">
             <span>Browse Trailers</span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M9 6l6 6-6 6"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </button>
         </div>
@@ -89,7 +69,7 @@ function image(path, size = 'w780') {
 }
 
 .hero-inner {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 16px;
   display: grid;
@@ -237,14 +217,17 @@ function image(path, size = 'w780') {
   flex-direction: column;
   gap: 10px;
 }
+
 .side-item {
   position: relative;
 }
+
 .side-item img {
   width: 100%;
   border-radius: 8px;
   display: block;
 }
+
 .side-meta {
   position: absolute;
   inset: auto 8px 8px 8px;
@@ -253,12 +236,14 @@ function image(path, size = 'w780') {
   justify-content: space-between;
   gap: 8px;
 }
+
 .side-title {
   color: #fff;
   margin: 0;
   font-size: 13px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
+
 .mini-play {
   width: 28px;
   height: 28px;
@@ -295,9 +280,11 @@ function image(path, size = 'w780') {
   .hero-inner {
     grid-template-columns: 1fr;
   }
+
   .hero-main {
     min-height: 280px;
   }
+
   .poster img {
     width: 120px;
   }

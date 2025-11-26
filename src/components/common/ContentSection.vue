@@ -14,10 +14,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  watermarkText: {
-    type: String,
-    default: '',
-  },
 })
 
 const scrollerRef = ref(null)
@@ -84,10 +80,7 @@ watch(
 
 <template>
   <div class="content-section-wrapper">
-    <div v-if="watermarkText" class="watermark-text">
-      {{ watermarkText }}
-    </div>
-    <section class="content-section" :class="{ 'has-watermark': watermarkText }">
+    <section class="content-section">
       <div class="container">
         <div class="section-header">
           <div class="title-wrap">
@@ -104,48 +97,16 @@ watch(
             </div>
           </div>
           <div class="controls">
-            <button
-              class="ctrl-btn"
-              :class="{ disabled: !canScrollPrev }"
-              aria-label="previous"
-              @click="scrollPrev"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <button class="ctrl-btn" :class="{ disabled: !canScrollPrev }" aria-label="previous" @click="scrollPrev">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
             </button>
-            <button
-              class="ctrl-btn"
-              :class="{ disabled: !canScrollNext }"
-              aria-label="next"
-              @click="scrollNext"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 6l6 6-6 6"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <button class="ctrl-btn" :class="{ disabled: !canScrollNext }" aria-label="next" @click="scrollNext">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
             </button>
           </div>
@@ -173,39 +134,14 @@ watch(
   position: relative;
 }
 
-.watermark-text {
-  margin-top: 0;
-  font-size: 10rem;
-  font-weight: 700;
-  color: rgba(195, 195, 195, 0.1);
-  text-transform: uppercase;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 0;
-  pointer-events: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1;
-  text-align: center;
-  max-width: 1500px;
-  margin: 0 auto;
-}
-
 .content-section {
   position: relative;
   z-index: 1;
   margin-top: 0;
 }
 
-.content-section.has-watermark {
-  margin-top: 70px;
-}
-
 .container {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -308,7 +244,7 @@ watch(
   padding-bottom: 2px;
 }
 
-.row-track > * {
+.row-track>* {
   flex: 0 0 auto;
   scroll-snap-align: start;
 }
