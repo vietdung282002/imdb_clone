@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import VerticalMovieCard from '@/components/movie/VerticalMovieCard.vue'
+import NavButton from '@/components/common/NavButton.vue'
 
 const props = defineProps({
   title: {
@@ -14,11 +15,28 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  showEmptyState: {
+    type: Boolean,
+    default: false,
+  },
+  emptyStateTitle: {
+    type: String,
+    default: 'Sign in to access your Watchlist',
+  },
+  emptyStateDescription: {
+    type: String,
+    default: 'Save shows and movies to keep track of what you want to watch.',
+  },
+  emptyStateButtonText: {
+    type: String,
+    default: 'Sign in to IMDb',
+  },
 })
 
 const scrollerRef = ref(null)
 const canScrollPrev = ref(false)
 const canScrollNext = ref(false)
+const isHovered = ref(false)
 
 function getItemWidth() {
   const track = scrollerRef.value?.querySelector('.row-track')
@@ -87,39 +105,47 @@ watch(
             <div class="titles">
               <h2 class="section-title">
                 {{ title }}
-                <span class="title-arrow" aria-hidden="true">
-                  <img src="@/assets/arrow.svg" width="28" height="28" />
-                </span>
+                <svg width="16" height="24" xmlns="http://www.w3.org/2000/svg"
+                  class="ipc-icon--chevron-right-inline title-chevron" viewBox="0 0 24 24" fill="currentColor"
+                  role="presentation">
+                  <path
+                    d="M5.622.631A2.153 2.153 0 0 0 5 2.147c0 .568.224 1.113.622 1.515l8.249 8.34-8.25 8.34a2.16 2.16 0 0 0-.548 2.07c.196.74.768 1.317 1.499 1.515a2.104 2.104 0 0 0 2.048-.555l9.758-9.866a2.153 2.153 0 0 0 0-3.03L8.62.61C7.812-.207 6.45-.207 5.622.63z">
+                  </path>
+                </svg>
               </h2>
               <p class="section-subtitle" v-if="subtitle">
                 {{ subtitle }}
               </p>
             </div>
           </div>
-          <div class="controls">
-            <button class="ctrl-btn" :class="{ disabled: !canScrollPrev }" aria-label="previous" @click="scrollPrev">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </button>
-            <button class="ctrl-btn" :class="{ disabled: !canScrollNext }" aria-label="next" @click="scrollNext">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </button>
-          </div>
         </div>
 
         <div class="movies-row" v-if="content.length > 0">
-          <div ref="scrollerRef" class="row-scroller">
-            <div class="row-track">
-              <template v-for="(item, index) in content" :key="item.id || item.url || index">
-                <slot name="card" :movie="item" :article="item">
-                  <VerticalMovieCard :movie="item" />
-                </slot>
-              </template>
+          <div class="movies-row-wrapper" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+            <NavButton v-if="canScrollPrev && isHovered" direction="prev" offset="0px" @click="scrollPrev"
+              class="row-nav-btn row-nav-btn-prev" />
+            <div ref="scrollerRef" class="row-scroller">
+              <div class="row-track">
+                <template v-for="(item, index) in content" :key="item.id || item.url || index">
+                  <slot name="card" :movie="item" :article="item">
+                    <VerticalMovieCard :movie="item" />
+                  </slot>
+                </template>
+              </div>
+            </div>
+            <NavButton v-if="canScrollNext" direction="next" offset="0px" @click="scrollNext"
+              class="row-nav-btn row-nav-btn-next" />
+          </div>
+        </div>
+        <div v-else-if="showEmptyState" class="empty-state">
+          <div class="empty-state-content">
+            <div class="empty-state-icon">
+              <img src="@/assets/bookmark_btn.svg" alt="Watchlist Empty State" />
+            </div>
+            <div class="empty-state-content-inner">
+              <h3 class="empty-state-title">{{ emptyStateTitle }}</h3>
+              <p class="empty-state-description">{{ emptyStateDescription }}</p>
+              <button class="empty-state-button">{{ emptyStateButtonText }}</button>
             </div>
           </div>
         </div>
@@ -165,7 +191,7 @@ watch(
 
 .section-title {
   color: #fff;
-  font-size: 1.125rem;
+  font-size: 22px;
   font-weight: 600;
   line-height: 1.2;
   display: inline-flex;
@@ -176,18 +202,25 @@ watch(
 .section-title::before {
   content: '';
   display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
+  width: 4px;
+  height: 1.2em;
   background-color: #f5c518;
   margin-right: 8px;
-  transform: translateY(-1px);
+  flex-shrink: 0;
+  border-radius: 4px;
 }
 
-.title-arrow {
+.title-chevron {
   display: inline-flex;
   margin-left: 6px;
-  color: #919191;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  transition: fill 0.2s ease;
+}
+
+.section-title:hover .title-chevron {
+  fill: #f5c518;
 }
 
 .section-subtitle {
@@ -197,36 +230,17 @@ watch(
   font-size: 0.875rem;
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.ctrl-btn {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  border: 1px solid #2f2f2f;
-  background-color: #1a1a1a;
-  color: #bdbdbd;
-  cursor: pointer;
-}
-
-.ctrl-btn.disabled {
-  opacity: 0.35;
-  cursor: default;
-  pointer-events: none;
-}
-
 .movies-row {
   overflow: hidden;
+  position: relative;
+}
+
+.movies-row-wrapper {
+  position: relative;
 }
 
 .row-scroller {
+  position: relative;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -247,5 +261,82 @@ watch(
 .row-track>* {
   flex: 0 0 auto;
   scroll-snap-align: start;
+}
+
+.row-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.row-nav-btn-prev {
+  left: 0;
+}
+
+.row-nav-btn-next {
+  right: 0;
+}
+
+.empty-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  border-radius: 12px;
+  margin: 0 24px;
+  padding: 24px;
+}
+
+.empty-state-content {
+  text-align: center;
+}
+
+.empty-state-icon {
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.empty-state-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.empty-state-title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.empty-state-description {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.empty-state-button {
+  min-height: 2.25rem;
+  background-color: #2a2a2a;
+  color: #5799ef;
+  border: none;
+  border-radius: 24px;
+  padding: 0px 32px;
+  margin: 32px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.empty-state-button:hover {
+  background-color: #3a3a3a;
+}
+
+.empty-state-content-inner {
+  margin-top: 0.5rem;
 }
 </style>

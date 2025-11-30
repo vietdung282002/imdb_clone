@@ -92,26 +92,6 @@ export const api = {
   },
 }
 
-const NEWS_API_KEY = 'ae836011cdc14179be41c06f687302b4'
-const NEWS_API_URL = 'https://newsapi.org/v2'
-
-export const newsApi = {
-  async searchNews(query, pageSize = 10) {
-    try {
-      const response = await fetch(
-        `${NEWS_API_URL}/everything?q=${encodeURIComponent(query)}&apiKey=${NEWS_API_KEY}&pageSize=${pageSize}&sortBy=publishedAt&language=en`,
-      )
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      return data.articles || []
-    } catch (error) {
-      console.error('Error fetching news:', error)
-      return []
-    }
-  },
-}
 
 export const getImageUrl = (path, size = 'w500') => {
   if (!path) return 'https://via.placeholder.com/500x750?text=No+Image'

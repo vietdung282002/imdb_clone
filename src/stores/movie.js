@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { api, newsApi } from '@/services/api'
+import { api } from '@/services/api'
 
 function createFetchAction(apiMethod, stateKey, errorMessage) {
   return async function () {
@@ -22,7 +22,6 @@ export const useMovieStore = defineStore('movie', {
     upcoming: [],
     topRated: [],
     boxOffice: [],
-    news: [],
     streaming: {
       prime: [],
       disney: [],
@@ -111,24 +110,6 @@ export const useMovieStore = defineStore('movie', {
         this.boxOffice = moviesWithRevenue.sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
       } catch (e) {
         this.error = e?.message || 'Failed to fetch box office movies'
-      } finally {
-        this.loading = false
-      }
-    },
-    async fetchMovieNews() {
-      this.loading = true
-      this.error = null
-      try {
-        const popularMovies = await api.getPopularMovies()
-        const topMovies = popularMovies.slice(0, 3)
-        const allNews = []
-        for (const movie of topMovies) {
-          const news = await newsApi.searchNews(movie.title, 5)
-          allNews.push(...news.slice(0, 1))
-        }
-        this.news = allNews.slice(0, 10)
-      } catch (e) {
-        this.error = e?.message || 'Failed to fetch movie news'
       } finally {
         this.loading = false
       }

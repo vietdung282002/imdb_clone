@@ -5,10 +5,10 @@ import { useMovieStore } from '@/stores/movie'
 import { usePeopleStore } from '@/stores/people'
 import HeroFeatured from '@/components/movie/HeroFeatured.vue'
 import PersonCard from '@/components/people/PersonCard.vue'
+import PopularCelebritiesSection from '@/components/people/PopularCelebritiesSection.vue'
 import HorizontalMovieCard from '@/components/movie/HorizontalMovieCard.vue'
 import StreamingSection from '@/components/common/StreamingSection.vue'
 import BoxOfficeSection from '@/components/common/BoxOfficeSection.vue'
-import MovieNewsCard from '@/components/movie/MovieNewsCard.vue'
 
 const movieStore = useMovieStore()
 const peopleStore = usePeopleStore()
@@ -17,7 +17,6 @@ onMounted(() => {
   movieStore.fetchAll()
   movieStore.fetchStreamingMovies()
   movieStore.fetchBoxOffice()
-  movieStore.fetchMovieNews()
   peopleStore.fetchPopular()
 })
 </script>
@@ -25,22 +24,14 @@ onMounted(() => {
 <template>
   <main class="home">
     <HeroFeatured :movies="movieStore.popular" />
-    <ContentSection
-      title="Top Picks"
-      subtitle="TV shows and movies just for you"
-      :content="movieStore.popular"
-    />
+    <PopularCelebritiesSection :people="peopleStore.popular" />
+    <ContentSection title="From your Watchlist" :showEmptyState="true" />
+    <ContentSection title="Top Picks" subtitle="TV shows and movies just for you" :content="movieStore.popular" />
     <ContentSection title="Top on IMDb this week" :content="movieStore.nowPlaying" />
-    <BoxOfficeSection
-      title="Top box office (US)"
-      subtitle="Weekend of March 8-10"
-      :content="movieStore.boxOffice"
-    />
-    <ContentSection
-      title="IMDb Originals"
+    <BoxOfficeSection title="Top box office (US)" subtitle="Weekend of March 8-10" :content="movieStore.boxOffice" />
+    <ContentSection title="IMDb Originals"
       subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
-      :content="movieStore.topRated"
-    >
+      :content="movieStore.topRated">
       <template #card="{ movie }">
         <HorizontalMovieCard :movie="movie" />
       </template>
@@ -51,16 +42,6 @@ onMounted(() => {
         <HorizontalMovieCard :movie="movie" :showReleaseDate="true" />
       </template>
     </ContentSection>
-    <ContentSection title="Born Today" :content="peopleStore.popular" subtitle="People born today">
-      <template #card="{ movie }">
-        <PersonCard :person="movie" />
-      </template>
-    </ContentSection>
-    <ContentSection title="Top News" :content="movieStore.news">
-      <template #card="{ movie: article }">
-        <MovieNewsCard :article="article" />
-      </template>
-    </ContentSection>
   </main>
 </template>
 
@@ -69,7 +50,7 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 120px;
+  gap: 24px;
   padding-bottom: 120px;
   background-color: #000;
 }
