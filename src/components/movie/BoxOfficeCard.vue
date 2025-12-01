@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { getImageUrl } from '@/services/api'
 
 const props = defineProps({
   movie: {
@@ -12,9 +11,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const posterUrl = computed(() => getImageUrl(props.movie.poster_path))
-const rating = computed(() => props.movie.vote_average?.toFixed(1) || 'N/A')
 
 const formatBoxOffice = computed(() => {
   const revenue = props.movie.revenue || props.movie.box_office || 0
@@ -36,33 +32,16 @@ const formatBoxOffice = computed(() => {
   <div class="box-office-card">
     <div class="rank-section">
       <span class="rank-number">{{ rank }}</span>
-      <div class="rank-bar"></div>
     </div>
-    <div class="poster-wrapper">
-      <img :src="posterUrl" :alt="movie.title" class="poster" />
-      <img
-        class="bookmark-icon"
-        src="@/assets/bookmark_btn.svg"
-        width="32"
-        height="40"
-        alt="bookmark"
-      />
-    </div>
+    <img src="@/assets/bookmark_btn.svg" width="32" height="42" alt="add" />
     <div class="movie-info">
-      <h3 class="movie-title">{{ movie.title }}</h3>
-      <div class="box-office">{{ formatBoxOffice }}</div>
-      <div class="meta-row">
-        <div class="imdb-rating">
-          <img class="action-icon" src="@/assets/filled_star.svg" width="24" height="24" />
-          <span class="score">{{ rating }}</span>
-        </div>
-        <div class="imdb-rating">
-          <img class="action-icon" src="@/assets/star.svg" width="24" height="24" />
-          <span class="rate">Rate</span>
-        </div>
-        <div class="info-btn">
-          <img src="@/assets/info.svg" width="18" height="18" />
-        </div>
+      <h3 class="movie-title">
+        <a href="#" class="movie-link">{{ movie.title }}</a>
+      </h3>
+      <div class="box-office-row">
+        <span class="box-office">{{ formatBoxOffice }}</span>
+        <span class="dot">·</span>
+        <span class="total-box-office">Total {{ formatBoxOffice }}</span>
       </div>
     </div>
   </div>
@@ -71,10 +50,9 @@ const formatBoxOffice = computed(() => {
 <style scoped>
 .box-office-card {
   display: flex;
-  gap: 20px;
-  padding: 12px 40px 12px 12px;
-  background-color: rgba(163, 163, 163, 0.05);
-  border-radius: 10px;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: transparent;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -82,54 +60,45 @@ const formatBoxOffice = computed(() => {
 .rank-section {
   display: flex;
   flex-direction: row;
-  align-items: start;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  padding: 0 16px 0 0;
 }
 
 .rank-number {
   color: #c3c3c3;
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1;
 }
 
-.rank-bar {
-  width: 3px;
+.add-btn {
+  width: 40px;
   height: 40px;
-  background-color: #f5c518;
-  border-radius: 2px;
-}
-
-.poster-wrapper {
-  position: relative;
-  height: 194px;
-  width: 126px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #1f1f1f 0%, #101010 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   flex-shrink: 0;
-  overflow: hidden;
-  background-color: #2a2a2a;
-  border-radius: 5px;
-}
-
-.poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 5px;
+  padding: 0;
 }
 
 .movie-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   min-width: 0;
+  padding: 0 0 0 12px;
 }
 
 .movie-title {
   margin: 0;
-  font-size: 1.125rem;
-  color: #c3c3c3;
+  font-size: 1rem;
+  color: #fff;
   font-weight: 700;
   overflow: hidden;
   display: -webkit-box;
@@ -140,75 +109,52 @@ const formatBoxOffice = computed(() => {
 }
 
 .box-office {
+  color: #ffffffb3;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.box-office-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   color: #797979;
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 0.9rem;
 }
 
-.meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 4px;
-  color: #bdbdbd;
-  font-size: 0.875rem;
+.dot {
+  margin: 0 2px;
 }
 
-.imdb-rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 0px;
+.total-box-office {
+  color: #ffffffb3;
+  font-size: 14px;
+  font-weight: 400;
 }
 
-.imdb-rating .action-icon {
-  display: block;
+.movie-link {
+  color: #5799ef;
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 1rem;
+  font-family: 'Roboto';
+  line-height: 24px;
 }
 
-.score {
-  color: #c3c3c3;
-  font-weight: 500;
-  font-size: 1.125rem;
-  line-height: 1;
+.movie-info .movie-title,
+.movie-info .box-office-row {
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
-.rate {
-  color: #bdbdbd;
-  font-size: 1.125rem;
-}
-
-.info-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 8px;
-}
-
-.bookmark-icon {
-  position: absolute;
-  top: 0px;
-  left: 8px;
-  z-index: 2;
+.movie-info:hover .movie-title,
+.movie-info:hover .box-office-row {
+  filter: blur(0.4px);
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {
   .box-office-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .rank-section {
-    flex-direction: row;
-  }
-
-  .rank-bar {
-    width: 40px;
-    height: 3px;
-  }
-
-  .poster-wrapper {
-    width: 120px;
+    padding: 8px 0;
   }
 }
 </style>

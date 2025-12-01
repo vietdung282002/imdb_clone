@@ -320,7 +320,7 @@ watch(
 
 .empty-state-button {
   min-height: 2.25rem;
-  background-color: #2a2a2a;
+  background-color: #ffffff14;
   color: #5799ef;
   border: none;
   border-radius: 24px;
@@ -328,7 +328,8 @@ watch(
   margin: 32px 0 0;
   font-size: 14px;
   line-height: 20px;
-  font-weight: 500;
+  font-weight: 700;
+  font-family: 'Roboto';
   cursor: pointer;
 }
 

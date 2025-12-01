@@ -4,11 +4,11 @@ import ContentSection from '@/components/common/ContentSection.vue'
 import { useMovieStore } from '@/stores/movie'
 import { usePeopleStore } from '@/stores/people'
 import HeroFeatured from '@/components/movie/HeroFeatured.vue'
-import PersonCard from '@/components/people/PersonCard.vue'
 import PopularCelebritiesSection from '@/components/people/PopularCelebritiesSection.vue'
 import HorizontalMovieCard from '@/components/movie/HorizontalMovieCard.vue'
 import StreamingSection from '@/components/common/StreamingSection.vue'
 import BoxOfficeSection from '@/components/common/BoxOfficeSection.vue'
+import GenreCard from '@/components/movie/GenreCard.vue'
 
 const movieStore = useMovieStore()
 const peopleStore = usePeopleStore()
@@ -17,6 +17,7 @@ onMounted(() => {
   movieStore.fetchAll()
   movieStore.fetchStreamingMovies()
   movieStore.fetchBoxOffice()
+  movieStore.fetchGenres()
   peopleStore.fetchPopular()
 })
 </script>
@@ -26,8 +27,12 @@ onMounted(() => {
     <HeroFeatured :movies="movieStore.popular" />
     <PopularCelebritiesSection :people="peopleStore.popular" />
     <ContentSection title="From your Watchlist" :showEmptyState="true" />
-    <ContentSection title="Top Picks" subtitle="TV shows and movies just for you" :content="movieStore.popular" />
-    <ContentSection title="Top on IMDb this week" :content="movieStore.nowPlaying" />
+    <ContentSection title="Fan favorites" subtitle="This week's top TV and movies" :content="movieStore.popular" />
+    <ContentSection title="Popular interests" :content="movieStore.genres">
+      <template #card="{ movie: genre }">
+        <GenreCard :genre="genre" />
+      </template>
+    </ContentSection>
     <BoxOfficeSection title="Top box office (US)" subtitle="Weekend of March 8-10" :content="movieStore.boxOffice" />
     <ContentSection title="IMDb Originals"
       subtitle="Celebrity interviews, trending entertainment stories, and expert analysis"
@@ -50,7 +55,7 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 48px;
   padding-bottom: 120px;
   background-color: #000;
 }

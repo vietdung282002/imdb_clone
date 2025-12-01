@@ -22,6 +22,7 @@ export const useMovieStore = defineStore('movie', {
     upcoming: [],
     topRated: [],
     boxOffice: [],
+    genres: [],
     streaming: {
       prime: [],
       disney: [],
@@ -110,6 +111,29 @@ export const useMovieStore = defineStore('movie', {
         this.boxOffice = moviesWithRevenue.sort((a, b) => (b.revenue || 0) - (a.revenue || 0))
       } catch (e) {
         this.error = e?.message || 'Failed to fetch box office movies'
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchGenres() {
+      this.loading = true
+      this.error = null
+      try {
+        const genres = await api.getGenres()
+        const genresWithMovies = await Promise.all(
+          genres.map(async (genre) => {
+            const movies = await api.getMoviesByGenre(genre.id)
+            const firstMovie = movies?.[0]
+            if (!firstMovie) return null
+            return {
+              ...genre,
+              firstMovie,
+            }
+          }),
+        )
+        this.genres = genresWithMovies.filter((item) => item !== null).slice(0, 10)
+      } catch (e) {
+        this.error = e?.message || 'Failed to fetch genres'
       } finally {
         this.loading = false
       }

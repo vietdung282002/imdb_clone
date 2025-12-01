@@ -19,6 +19,14 @@ const props = defineProps({
 const displayMovies = computed(() => {
   return props.content.slice(0, 6)
 })
+
+const leftColumnMovies = computed(() => {
+  return displayMovies.value.slice(0, 3)
+})
+
+const rightColumnMovies = computed(() => {
+  return displayMovies.value.slice(3, 6)
+})
 </script>
 
 <template>
@@ -42,10 +50,17 @@ const displayMovies = computed(() => {
         </div>
 
         <div class="box-office-grid" v-if="displayMovies.length > 0">
-          <BoxOfficeCard v-for="(movie, index) in displayMovies" :key="movie.id" :movie="movie" :rank="index + 1" />
+          <div class="box-office-column">
+            <BoxOfficeCard v-for="(movie, index) in leftColumnMovies" :key="movie.id" :movie="movie"
+              :rank="index + 1" />
+          </div>
+          <div class="box-office-column">
+            <BoxOfficeCard v-for="(movie, index) in rightColumnMovies" :key="movie.id" :movie="movie"
+              :rank="index + 4" />
+          </div>
         </div>
         <div v-else class="empty-state">
-          <p>Không có dữ liệu box office</p>
+          <p>No Data</p>
         </div>
       </div>
     </section>
@@ -121,9 +136,14 @@ const displayMovies = computed(() => {
 }
 
 .box-office-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  display: flex;
+  gap: 2rem;
+}
+
+.box-office-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .empty-state {
@@ -139,13 +159,13 @@ const displayMovies = computed(() => {
 
 @media (max-width: 1024px) {
   .box-office-grid {
-    grid-template-columns: repeat(2, 1fr);
+    flex-direction: column;
   }
 }
 
 @media (max-width: 768px) {
   .box-office-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
 </style>

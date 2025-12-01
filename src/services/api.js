@@ -90,8 +90,20 @@ export const api = {
       `&with_watch_providers=${providerId}&page=${page}`,
     )
   },
-}
 
+  async getGenres() {
+    const data = await fetchDetailAPI('/genre/movie/list', 'Error fetching genres:')
+    return data?.genres || []
+  },
+
+  async getMoviesByGenre(genreId, page = 1) {
+    return fetchAPI(
+      '/discover/movie',
+      `Error fetching movies for genre ${genreId}:`,
+      `&with_genres=${genreId}&sort_by=popularity.desc&page=${page}`,
+    )
+  },
+}
 
 export const getImageUrl = (path, size = 'w500') => {
   if (!path) return 'https://via.placeholder.com/500x750?text=No+Image'
